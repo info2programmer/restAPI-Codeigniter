@@ -6,6 +6,15 @@ require APPPATH . '/libraries/RestController.php';
 class Example extends RestController
 {
 
+  
+  public function __construct()
+  {
+    parent::__construct();
+    header("Access-Control-Allow-Origin:  *");
+    header("Access-Control-Allow-Methods: GET, POST, PUT");
+  }
+  
+
   // $table,$return_type='array',$list=NULL,$conditions='',$select='*',$join='',$group_by='',$order_by='',$limit=0,$offset=0,$or_where_in='',$or_like=''
 
   public function user_get($id = 0)
@@ -15,14 +24,14 @@ class Example extends RestController
       // If userid exist then  this block will execute and send specific user
       $userData = $this->common_model->find_data(['name' => 'users'], 'row', '', ['id' => $id]);
       if ($userData) {
-        $this->response($userData, RestController::HTTP_OK);
+        $this->response($userData);
       } else {
         $this->response(['status' => false, 'msg' => "UserId not exist"], RestController::HTTP_NOT_FOUND);
       }
     } else {
       // If userid not exist then this block will execute and send all users
       $userData = $this->common_model->find_data(['name' => 'users'], 'array');
-      $this->response($userData, RestController::HTTP_OK);
+      $this->response($userData);
     }
   }
 
@@ -47,10 +56,14 @@ class Example extends RestController
 
   public function user_post()
   {
+    // header("Access-Control-Allow-Origin:  http://localhost:3000");
+      
     $fullName = $this->input->post('fullName');
     $email = $this->input->post('email');
     $phoneNumber = $this->input->post('phoneNumber');
     $dateOfBirth = $this->input->post('dateOfBirth');
+
+   
 
     if (!empty($fullName) && !empty($email) && !empty($phoneNumber) && !empty($dateOfBirth)) {
       $data = array(
@@ -60,7 +73,7 @@ class Example extends RestController
         'dateOfBirth' => $dateOfBirth
       );
       $userId = $this->common_model->insert_record('users', $data);
-      $this->user_get($userId);
+      $this->response(['status' => true, 'msg' => "Data Updated"], RestController::HTTP_OK);
     } else {
       $this->response(['status' => false, 'msg' => "All Fields Mandetory"], RestController::HTTP_NOT_MODIFIED);
     }
